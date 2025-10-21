@@ -1,0 +1,70 @@
+%%html
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Terminal do Amor</title>
+<style>
+  body { background:#0b0f13; color:#a6f0c6; font-family: "Courier New", monospace; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; }
+  .term { width:90%; max-width:720px; background:#061012; padding:24px; border-radius:10px; box-shadow:0 8px 30px rgba(0,0,0,0.6); }
+  .cursor { display:inline-block; width:8px; background:#a6f0c6; margin-left:6px; animation:blink .8s infinite; vertical-align:bottom; }
+  @keyframes blink { 0%{opacity:1}50%{opacity:0}100%{opacity:1} }
+  .line{ white-space:pre-wrap; line-height:1.5; font-size:16px; }
+  .bar{ display:inline-block; background:#072b1d; padding:2px 8px; border-radius:6px; color:#7be5b9; margin-left:6px; }
+</style>
+</head>
+<body>
+  <div class="term" id="term">
+    <div class="line" id="l1"></div>
+    <div class="line" id="l2"></div>
+    <div class="line" id="l3"></div>
+    <div class="line" id="l4"></div>
+    <div class="line" id="l5"></div>
+    <div class="line" id="l6"></div>
+    <div class="line" id="l7"></div>
+    <div class="line" id="l8"></div>
+  </div>
+
+<script>
+const lines = [
+  "Inicializando Terminal do Amor...",
+  "Detectando conexao com: [Manu]",
+  "Ping: 1 ms - sorriso detectado.",
+  "Carregando motivos pra sorrir... [          ] 0%",
+  "Carregando motivos pra sorrir... [#####     ] 50%",
+  "Carregando motivos pra sorrir... [##########] 100%",
+  "Checando dependencias: chocolate [OK], risada [OK], alegria [OK]",
+  "Status: voce me bagunca, mas de um jeito bom."
+];
+
+function typeLine(el, text, speed=30) {
+  return new Promise(resolve => {
+    let i=0;
+    function step(){
+      if(i<=text.length){
+        el.textContent = text.slice(0,i) + (i%2? '':'');
+        i++;
+        setTimeout(step, speed);
+      } else resolve();
+    }
+    step();
+  });
+}
+
+async function run(){
+  for(let i=0;i<lines.length;i++){
+    const el = document.getElementById('l'+(i+1));
+    await typeLine(el, lines[i], 25 + Math.random()*30);
+    await new Promise(r => setTimeout(r, 450));
+  }
+  // adiciona cursor final
+  const last = document.getElementById('l8');
+  const cur = document.createElement('span');
+  cur.className='cursor';
+  last.appendChild(cur);
+}
+run();
+</script>
+</body>
+</html>

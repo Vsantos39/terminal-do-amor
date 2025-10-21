@@ -1,0 +1,183 @@
+html_content = """
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal do Amor 2.0 - Saudade.exe</title>
+<style>
+  body {
+    background-color: #0a0a0a;
+    color: #00ff9f;
+    font-family: "Courier New", monospace;
+    font-size: 18px;
+    padding: 20px;
+    overflow: hidden;
+  }
+  #terminal {
+    white-space: pre-wrap;
+    word-wrap: break-word; /* Added for better word wrapping */
+  }
+  .hearts {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    display: none;
+  }
+  .heart {
+    position: absolute;
+    color: #ff4da6;
+    animation: floatUp 5s linear infinite;
+    font-size: 20px;
+    text-shadow: 0 0 5px #ff4da6; /* Added text shadow for visual flair */
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(100vh) scale(0.8); opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+  }
+  .error {
+    color: #ff0000; /* Red color for error messages */
+    font-weight: bold; /* Added bold for emphasis */
+  }
+  .success {
+      color: #00ff9f; /* Green color for success messages */
+  }
+</style>
+</head>
+<body>
+<div id="terminal">&gt; Digite a palavra secreta:</div>
+<div class="hearts" id="hearts"></div>
+
+<!-- Sons -->
+<audio id="boot" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+</audio>
+
+<audio id="bip" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<script>
+const terminal = document.getElementById('terminal');
+const heartsContainer = document.getElementById('hearts');
+const bip = document.getElementById('bip');
+const boot = document.getElementById('boot');
+
+let input = "";
+const commandHistory = []; // Added command history
+let historyIndex = -1; // Added history index
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (input.trim() !== "") { // Prevent processing empty input
+        commandHistory.push(input); // Add command to history
+        historyIndex = -1; // Reset history index
+        processCommand();
+        input = "";
+    }
+  } else if (e.key === 'Backspace') {
+    input = input.slice(0, -1);
+  } else if (e.key === 'ArrowUp') {
+      if (commandHistory.length > 0 && historyIndex < commandHistory.length -1) {
+          historyIndex++;
+          input = commandHistory[commandHistory.length - 1 - historyIndex];
+      }
+  } else if (e.key === 'ArrowDown') {
+      if (historyIndex > 0) {
+          historyIndex--;
+          input = commandHistory[commandHistory.length - 1 - historyIndex];
+      } else {
+          historyIndex = -1;
+          input = "";
+      }
+  }
+  else if (e.key.length === 1 && e.key.match(/[a-zA-Z0-9\s]/)) { // Allow letters, numbers and space
+    input += e.key;
+  }
+});
+
+function processCommand() {
+  const command = input.toLowerCase();
+  terminal.innerHTML += `\\n> ${input}`; // Display the typed command
+
+  if (command === "saudades") {
+    boot.play();
+    setTimeout(() => {
+      typeLines([
+        "<span class='success'>> Analisando entrada...</span>",
+        "<span class='success'>> Palavra secreta reconhecida.</span>",
+        "<span class='success'>> Iniciando transmissão emocional...</span>",
+        "<span class='success'>> ❤️💻 Conexão emocional restabelecida 💖</span>",
+        "<span class='success'>> Sistema confirma: saudades detectadas dos dois lados.</span>"
+      ]);
+      startHearts();
+      setTimeout(() => bip.play(), 2500);
+    }, 1000);
+  } else if (command === "abraço") {
+      typeLines([
+          "<span class='success'>> Processando solicitação...</span>",
+          "<span class='success'>> Transmitindo um abraço virtual.</span>",
+          "<span class='success'>> 🤗 Abraço enviado com sucesso! 🤗</span>"
+      ]);
+  } else if (command === "beijo") {
+      typeLines([
+          "<span class='success'>> Iniciando protocolo beijo...</span>",
+          "<span class='success'>> Enviando um beijo carregado de carinho.</span>",
+          "<span class='success'>> 💋 Beijo recebido? 💋</span>"
+      ]);
+  } else if (command === "limpar" || command === "clear") { // Added 'clear' as an alias
+      terminal.innerHTML = "&gt; Digite a palavra secreta:";
+  } else if (command === "ajuda" || command === "help") { // Added help command
+      typeLines([
+          "> Comandos disponíveis:",
+          "> 'saudades' - Conecta emocionalmente.",
+          "> 'abraço' - Envia um abraço virtual.",
+          "> 'beijo' - Envia um beijo virtual.",
+          "> 'limpar' ou 'clear' - Limpa a tela.",
+          "> 'ajuda' ou 'help' - Exibe esta mensagem."
+      ]);
+  }
+  else {
+    terminal.innerHTML += `\\n<span class="error">> Comando '${input}' não reconhecido. Digite 'ajuda' para ver a lista de comandos.</span>`;
+  }
+}
+
+function typeLines(lines) {
+  let i = 0;
+  function nextLine() {
+    if (i < lines.length) {
+      setTimeout(() => {
+        terminal.innerHTML += "\\n" + lines[i];
+        window.scrollTo(0, document.body.scrollHeight);
+        i++;
+        nextLine();
+      }, 200); // Reduced typing speed for better simulation
+    }
+  }
+  nextLine();
+}
+
+function startHearts() {
+  heartsContainer.style.display = 'block';
+  heartsContainer.innerHTML = ''; // Clear existing hearts
+  for (let i = 0; i < 50; i++) { // Increased number of hearts
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDelay = Math.random() * 8 + 's'; // Increased animation delay range
+    heart.style.animationDuration = Math.random() * 4 + 3 + 's'; // Varied animation duration
+    heart.innerHTML = '💖';
+    heartsContainer.appendChild(heart);
+  }
+}
+</script>
+</body>
+</html>
+"""
+
+from IPython.display import display, HTML
+display(HTML(html_content))
